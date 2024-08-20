@@ -3,14 +3,16 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Author(models.Model):
-    first_name = models.CharField(max_length=100)
-    last_name = models.CharField(max_length=100)
-    birth_date = models.DateField()
-    profile = models.URLField(null=True, blank=True)  # Профиль автора
-    deleted = models.BooleanField(default=False)  # Поле для пометки автора как удаленного
+    first_name = models.CharField(max_length=100, verbose_name="First name")
+    last_name = models.CharField(max_length=100, verbose_name="Last name")
+    birth_date = models.DateField(verbose_name="Birth date")
+    profile = models.URLField(null=True, blank=True, verbose_name="Profile URL")
+    deleted = models.BooleanField(default=False, verbose_name="Deleted",
+                                  help_text="If checked, the author is considered removed from the list")
     rating = models.IntegerField(
         default=1,
-        validators=[MinValueValidator(1), MaxValueValidator(10)]
+        validators=[MinValueValidator(1), MaxValueValidator(10)],
+        verbose_name="Rating"
     )
 
     def __str__(self):
