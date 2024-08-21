@@ -44,6 +44,15 @@ class Category(models.Model):
     def __str__(self):
         return self.name
 
+    
+class Library(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Library Name")
+    location = models.CharField(max_length=200, verbose_name="Location")
+    site = models.URLField(null=True, blank=True, verbose_name="Website")
+
+    def __str__(self):
+        return self.name
+
 
 class Book(models.Model):
     title = models.CharField(max_length=100, verbose_name="Title")
@@ -56,6 +65,7 @@ class Book(models.Model):
     publisher = models.ForeignKey(Publisher, null=True, on_delete=models.CASCADE, verbose_name="Publisher")
     category = models.ForeignKey(Category, null=True, on_delete=models.SET_NULL, related_name='books',
                                  verbose_name="Category")
+    libraries = models.ManyToManyField(Library, related_name='books', verbose_name="Libraries")
 
     def __str__(self):
         return self.title
