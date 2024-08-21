@@ -1,26 +1,6 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
-
-GENRE_CHOICES = [
-    ('Fiction', 'Fiction'),
-    ('Non-Fiction', 'Non-Fiction'),
-    ('Science Fiction', 'Science Fiction'),
-    ('Fantasy', 'Fantasy'),
-    ('Mystery', 'Mystery'),
-    ('Biography', 'Biography'),
-]
-
-GENDER_CHOICES = [
-    ('Male', 'Male'),
-    ('Female', 'Female'),
-    ('Other', 'Other'),
-]
-
-ROLE_CHOICES = [
-    ('Admin', 'Admin'),
-    ('Staff', 'Staff'),
-    ('Reader', 'Reader'),
-]
+from django.utils import timezone
 
 
 class Author(models.Model):
@@ -57,6 +37,17 @@ class Library(models.Model):
 
 
 class Member(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+
+    ROLE_CHOICES = [
+        ('Staff', 'Staff'),
+        ('Reader', 'Reader'),
+    ]
+
     first_name = models.CharField(max_length=50, verbose_name="First Name")
     last_name = models.CharField(max_length=50, verbose_name="Last Name")
     email = models.EmailField(unique=True, verbose_name="Email")
@@ -85,6 +76,15 @@ class Post(models.Model):
 
 
 class Book(models.Model):
+    GENRE_CHOICES = [
+        ('Fiction', 'Fiction'),
+        ('Non-Fiction', 'Non-Fiction'),
+        ('Science Fiction', 'Science Fiction'),
+        ('Fantasy', 'Fantasy'),
+        ('Mystery', 'Mystery'),
+        ('Biography', 'Biography'),
+    ]
+
     title = models.CharField(max_length=100, verbose_name="Title")
     author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, verbose_name="Author")
     publishing_date = models.DateField(verbose_name="Publishing Date")
@@ -98,3 +98,20 @@ class Book(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Borrow(models.Model):
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='borrows', verbose_name="Member")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='borrows', verbose_name="Book")
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='borrows', verbose_name="Library")
+    borrow_date = models.DateField(verbose_name="Borrow Date")
+    return_date = models.DateField(verbose_name="Return Date")
+    returned = models.BooleanField(default=False, verbose_name="Returned")
+
+    def is_overdue(self):
+        if self.returned:
+            return False
+        return self.return_date < timezone.now().date()
+
+    def __str__(self):
+        return f"{self.member} borrowed {self.book}"
