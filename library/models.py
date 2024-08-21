@@ -1,6 +1,15 @@
 from django.db import models
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+GENRE_CHOICES = [
+    ('Fiction', 'Fiction'),
+    ('Non-Fiction', 'Non-Fiction'),
+    ('Science Fiction', 'Science Fiction'),
+    ('Fantasy', 'Fantasy'),
+    ('Mystery', 'Mystery'),
+    ('Biography', 'Biography'),
+]
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=100, verbose_name="First name")
@@ -20,9 +29,13 @@ class Author(models.Model):
 
 
 class Book(models.Model):
-    title = models.CharField(max_length=100, verbose_name="Title")  # Название книги
-    author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, verbose_name="Author")  # Ссылка на автора
-    publishing_date = models.DateField(verbose_name="Publishing Date")  # Дата публикации
+    title = models.CharField(max_length=100, verbose_name="Title")
+    author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, verbose_name="Author")
+    publishing_date = models.DateField(verbose_name="Publishing Date")
+    summary = models.TextField(null=True, blank=True, verbose_name="Summary")
+    genre = models.CharField(max_length=50, choices=GENRE_CHOICES, null=True, verbose_name="Genre")
+    page_count = models.IntegerField(null=True, blank=True, validators=[MaxValueValidator(10000)],
+                                     verbose_name="Page Count")
 
     def __str__(self):
         return self.title
