@@ -96,8 +96,30 @@ class Book(models.Model):
                                  verbose_name="Category")
     libraries = models.ManyToManyField(Library, related_name='books', verbose_name="Libraries")
 
+    @property
+    def rating(self):
+        reviews = self.reviews.all()
+        total_reviews = reviews.count()
+
+        if total_reviews == 0:
+            return 0
+
+        total_rating = sum(review.rating for review in reviews)
+        average_rating = total_rating / total_reviews
+        return round(average_rating, 2)
+
     def __str__(self):
         return self.title
+
+
+class Review(models.Model):
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews', verbose_name="Book")
+    reviewer = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='reviews', verbose_name="Reviewer")
+    rating = models.FloatField(validators=[MinValueValidator(1), MaxValueValidator(5)], verbose_name="Rating")
+    description = models.TextField(verbose_name="Review Description")
+
+    def __str__(self):
+        return f"Review of {self.book.title} by {self.reviewer.first_name} {self.reviewer.last_name}"
 
 
 class Borrow(models.Model):
