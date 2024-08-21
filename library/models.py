@@ -153,3 +153,23 @@ class Borrow(models.Model):
 
     def __str__(self):
         return f"{self.member} borrowed {self.book}"
+
+
+class Event(models.Model):
+    title = models.CharField(max_length=255, verbose_name="Event Title")
+    description = models.TextField(verbose_name="Event Description")
+    date = models.DateTimeField(verbose_name="Event Date")
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='events', verbose_name="Library")
+    books = models.ManyToManyField(Book, related_name='events', verbose_name="Books")
+
+    def __str__(self):
+        return self.title
+
+
+class EventParticipant(models.Model):
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='participants', verbose_name="Event")
+    member = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='event_participations', verbose_name="Participant")
+    registration_date = models.DateField(default=timezone.now, verbose_name="Registration Date")
+
+    def __str__(self):
+        return f"{self.member} registered for {self.event}"
