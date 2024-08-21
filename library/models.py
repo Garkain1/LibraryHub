@@ -71,6 +71,19 @@ class Member(models.Model):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
 
+class Post(models.Model):
+    title = models.CharField(max_length=255, unique_for_date='created_at', verbose_name="Title")
+    body = models.TextField(verbose_name="Body")
+    author = models.ForeignKey(Member, on_delete=models.CASCADE, related_name='posts', verbose_name="Author")
+    moderated = models.BooleanField(default=False, verbose_name="Moderated")
+    library = models.ForeignKey(Library, on_delete=models.CASCADE, related_name='posts', verbose_name="Library")
+    created_at = models.DateField(verbose_name="Created At")
+    updated_at = models.DateField(auto_now=True, verbose_name="Updated At")
+
+    def __str__(self):
+        return self.title
+
+
 class Book(models.Model):
     title = models.CharField(max_length=100, verbose_name="Title")
     author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, verbose_name="Author")
