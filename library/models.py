@@ -17,3 +17,12 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+class Book(models.Model):
+    title = models.CharField(max_length=100, verbose_name="Title")  # Название книги
+    author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, verbose_name="Author")  # Ссылка на автора
+    publishing_date = models.DateField(verbose_name="Publishing Date")  # Дата публикации
+
+    def __str__(self):
+        return self.title
