@@ -20,6 +20,22 @@ class Author(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+class AuthorDetail(models.Model):
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
+    ]
+
+    author = models.OneToOneField(Author, on_delete=models.CASCADE, related_name='details', verbose_name="Author")
+    biography = models.TextField(verbose_name="Biography")
+    birth_city = models.CharField(max_length=50, null=True, blank=True, verbose_name="Birth City")
+    gender = models.CharField(max_length=50, choices=GENDER_CHOICES, verbose_name="Gender")
+
+    def __str__(self):
+        return f"Details of {self.author}"
+
+
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True, verbose_name="Category Name")
 
@@ -119,7 +135,7 @@ class Review(models.Model):
     description = models.TextField(verbose_name="Review Description")
 
     def __str__(self):
-        return f"Review of {self.book.title} by {self.reviewer.first_name} {self.reviewer.last_name}"
+        return f"Review of {self.book} by {self.reviewer}"
 
 
 class Borrow(models.Model):
