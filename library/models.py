@@ -28,6 +28,16 @@ class Author(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+class Publisher(models.Model):
+    name = models.CharField(max_length=100, verbose_name="Name")
+    address = models.CharField(max_length=255, null=True, blank=True, verbose_name="Address")
+    city = models.CharField(max_length=100, null=True, blank=True, verbose_name="City")
+    country = models.CharField(max_length=100, verbose_name="Country")
+
+    def __str__(self):
+        return self.name
+
+
 class Book(models.Model):
     title = models.CharField(max_length=100, verbose_name="Title")
     author = models.ForeignKey(Author, null=True, on_delete=models.SET_NULL, verbose_name="Author")
@@ -36,6 +46,7 @@ class Book(models.Model):
     genre = models.CharField(max_length=50, choices=GENRE_CHOICES, null=True, verbose_name="Genre")
     page_count = models.IntegerField(null=True, blank=True, validators=[MaxValueValidator(10000)],
                                      verbose_name="Page Count")
+    publisher = models.ForeignKey(Publisher, null=True, on_delete=models.CASCADE, verbose_name="Publisher")
 
     def __str__(self):
         return self.title
