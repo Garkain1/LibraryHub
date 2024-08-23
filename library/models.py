@@ -19,6 +19,14 @@ class Author(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name[0]}."
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['last_name', 'first_name']),
+        ]
+        verbose_name = "Author"
+        verbose_name_plural = "Authors"
+        ordering = ['last_name', 'first_name']
+
 
 class AuthorDetail(models.Model):
     GENDER_CHOICES = [
@@ -35,12 +43,22 @@ class AuthorDetail(models.Model):
     def __str__(self):
         return f"Details of {self.author}"
 
+    class Meta:
+        verbose_name = "Author Detail"
+        verbose_name_plural = "Author Details"
+        ordering = ['author__last_name']
+
 
 class Category(models.Model):
     name = models.CharField(max_length=30, unique=True, verbose_name="Category Name")
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        verbose_name = "Category"
+        verbose_name_plural = "Categories"
+        ordering = ['name']
 
 
 class Library(models.Model):
@@ -50,6 +68,14 @@ class Library(models.Model):
 
     def __str__(self):
         return self.name
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['location']),
+        ]
+        verbose_name = "Library"
+        verbose_name_plural = "Libraries"
+        ordering = ['name']
 
 
 class Member(models.Model):
@@ -77,6 +103,14 @@ class Member(models.Model):
     def __str__(self):
         return f"{self.first_name} {self.last_name} ({self.role})"
 
+    class Meta:
+        indexes = [
+            models.Index(fields=['last_name', 'first_name']),
+        ]
+        verbose_name = "Member"
+        verbose_name_plural = "Members"
+        ordering = ['last_name', 'first_name']
+
 
 class Post(models.Model):
     title = models.CharField(max_length=255, unique_for_date='created_at', verbose_name="Title")
@@ -89,6 +123,15 @@ class Post(models.Model):
 
     def __str__(self):
         return self.title
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['created_at']),
+            models.Index(fields=['author']),
+        ]
+        verbose_name = "Post"
+        verbose_name_plural = "Posts"
+        ordering = ['-created_at']
 
 
 class Book(models.Model):
@@ -127,6 +170,16 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        unique_together = ['title', 'author']
+        indexes = [
+            models.Index(fields=['genre']),
+            models.Index(fields=['publishing_date']),
+        ]
+        verbose_name = "Book"
+        verbose_name_plural = "Books"
+        ordering = ['-publishing_date']
+
 
 class Review(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name='reviews', verbose_name="Book")
@@ -136,6 +189,16 @@ class Review(models.Model):
 
     def __str__(self):
         return f"Review of {self.book} by {self.reviewer}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['rating']),
+            models.Index(fields=['book']),
+            models.Index(fields=['reviewer']),
+        ]
+        verbose_name = "Review"
+        verbose_name_plural = "Reviews"
+        ordering = ['-rating']
 
 
 class Borrow(models.Model):
@@ -154,6 +217,16 @@ class Borrow(models.Model):
     def __str__(self):
         return f"{self.member} borrowed {self.book}"
 
+    class Meta:
+        unique_together = ['member', 'book', 'borrow_date']
+        indexes = [
+            models.Index(fields=['borrow_date']),
+            models.Index(fields=['return_date']),
+        ]
+        verbose_name = "Borrow"
+        verbose_name_plural = "Borrows"
+        ordering = ['-borrow_date']
+
 
 class Event(models.Model):
     title = models.CharField(max_length=255, verbose_name="Event Title")
@@ -165,6 +238,15 @@ class Event(models.Model):
     def __str__(self):
         return self.title
 
+    class Meta:
+        unique_together = ['title', 'date']
+        indexes = [
+            models.Index(fields=['date']),
+        ]
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
+        ordering = ['-date']
+
 
 class EventParticipant(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='participants', verbose_name="Event")
@@ -173,3 +255,13 @@ class EventParticipant(models.Model):
 
     def __str__(self):
         return f"{self.member} registered for {self.event}"
+
+    class Meta:
+        unique_together = ['event', 'member']
+        indexes = [
+            models.Index(fields=['member']),
+            models.Index(fields=['event']),
+        ]
+        verbose_name = "Event Participant"
+        verbose_name_plural = "Event Participants"
+        ordering = ['-registration_date']
